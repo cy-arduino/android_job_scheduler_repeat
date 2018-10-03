@@ -1,0 +1,4 @@
+#Wed Oct 03 16:02:52 CST 2018
+base.0=C\:\\Users\\cy\\Desktop\\ChihYing\\android_studio_projects\\job_scheduler_1\\Application\\build\\intermediates\\transforms\\dexMerger\\debug\\4
+path.0=classes.dex
+renamed.0=classes.dex
