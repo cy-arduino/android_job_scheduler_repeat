@@ -32,6 +32,7 @@ limitations under the License.
     <string name="timing">Timing:</string>
     <string name="delay">Delay:</string>
     <string name="deadline">Deadline:</string>
+    <string name="repeat">Repeat:</string>
     <string name="work_duration">Work duration:</string>
     <string name="cancelled_job">Cancelled job %d</string>
     <string name="no_jobs_to_cancel">No jobs to cancel</string>

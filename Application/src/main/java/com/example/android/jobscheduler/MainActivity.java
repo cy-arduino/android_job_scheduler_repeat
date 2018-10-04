@@ -64,9 +64,13 @@ public class MainActivity extends Activity {
     public static final String WORK_DURATION_KEY =
             BuildConfig.APPLICATION_ID + ".WORK_DURATION_KEY";
 
+    public static final String COUNT_KEY =
+            BuildConfig.APPLICATION_ID + ".COUNT_KEY";
+
     private EditText mDelayEditText;
     private EditText mDeadlineEditText;
     private EditText mDurationTimeEditText;
+    private EditText mRepeatCountEditText;
     private RadioButton mWiFiConnectivityRadioButton;
     private RadioButton mAnyConnectivityRadioButton;
     private CheckBox mRequiresChargingCheckBox;
@@ -87,6 +91,7 @@ public class MainActivity extends Activity {
         // Set up UI.
         mDelayEditText = (EditText) findViewById(R.id.delay_time);
         mDurationTimeEditText = (EditText) findViewById(R.id.duration_time);
+        mRepeatCountEditText = (EditText) findViewById(R.id.repeat_count);
         mDeadlineEditText = (EditText) findViewById(R.id.deadline_time);
         mWiFiConnectivityRadioButton = (RadioButton) findViewById(R.id.checkbox_unmetered);
         mAnyConnectivityRadioButton = (RadioButton) findViewById(R.id.checkbox_any);
@@ -103,7 +108,9 @@ public class MainActivity extends Activity {
         // and "bound" to the JobScheduler (also called "Scheduled" by the JobScheduler). This call
         // to stopService() won't prevent scheduled jobs to be processed. However, failing
         // to call stopService() would keep it alive indefinitely.
-        stopService(new Intent(this, MyJobService.class));
+
+        //cy: don't stop service~
+        //stopService(new Intent(this, MyJobService.class));
         super.onStop();
     }
 
@@ -149,6 +156,12 @@ public class MainActivity extends Activity {
         }
         extras.putLong(WORK_DURATION_KEY, Long.valueOf(workDuration) * 1000);
 
+        String repeatCount = mRepeatCountEditText.getText().toString();
+        if (TextUtils.isEmpty(repeatCount)) {
+            repeatCount = "10";
+        }
+
+        extras.putLong(COUNT_KEY, Long.valueOf(repeatCount));
         builder.setExtras(extras);
 
         // Schedule job

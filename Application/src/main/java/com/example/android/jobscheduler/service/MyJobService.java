@@ -16,22 +16,30 @@
 
 package com.example.android.jobscheduler.service;
 
+import android.app.job.JobInfo;
 import android.app.job.JobParameters;
+import android.app.job.JobScheduler;
 import android.app.job.JobService;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
+import android.os.PersistableBundle;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.View;
+
 
 
 import static com.example.android.jobscheduler.MainActivity.MESSENGER_INTENT_KEY;
 import static com.example.android.jobscheduler.MainActivity.MSG_COLOR_START;
 import static com.example.android.jobscheduler.MainActivity.MSG_COLOR_STOP;
 import static com.example.android.jobscheduler.MainActivity.WORK_DURATION_KEY;
-
+import static com.example.android.jobscheduler.MainActivity.COUNT_KEY;
 
 /**
  * Service to handle callbacks from the JobScheduler. Requests scheduled with the JobScheduler
@@ -66,6 +74,31 @@ public class MyJobService extends JobService {
         return START_NOT_STICKY;
     }
 
+    public void scheduleJob(int jobId, long count) {
+
+        JobInfo.Builder builder = new JobInfo.Builder(jobId, new ComponentName(this, MyJobService.class));
+
+        builder.setMinimumLatency(3*1000);
+        builder.setOverrideDeadline(1 * 1000);
+
+        builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY);
+
+        builder.setRequiresDeviceIdle(false);
+        builder.setRequiresCharging(false);
+
+        // Extras, work duration.
+        PersistableBundle extras = new PersistableBundle();
+        extras.putLong(WORK_DURATION_KEY, 1 * 1000);
+        extras.putLong(COUNT_KEY, count-1);
+
+        builder.setExtras(extras);
+
+        // Schedule job
+        Log.d(TAG, "Scheduling job");
+        JobScheduler tm = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        tm.schedule(builder.build());
+    }
+
     @Override
     public boolean onStartJob(final JobParameters params) {
         // The work that this service "does" is simply wait for a certain duration and finish
@@ -82,6 +115,14 @@ public class MyJobService extends JobService {
             public void run() {
                 sendMessage(MSG_COLOR_STOP, params.getJobId());
                 jobFinished(params, false);
+                Log.i(TAG, "on job finished: " + params.getJobId());
+
+
+                Long count = params.getExtras().getLong(COUNT_KEY);
+                Log.i(TAG, "schedule next job. count = " + count);
+                if(count > 0){
+                    scheduleJob(params.getJobId(), count);
+                }
             }
         }, duration);
         Log.i(TAG, "on start job: " + params.getJobId());
